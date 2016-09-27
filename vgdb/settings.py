@@ -135,5 +135,10 @@ STATICFILES_DIRS = (
 
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 
+# Simplified static file serving.
+# https://warehouse.python.org/project/whitenoise/
+
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
