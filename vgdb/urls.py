@@ -16,13 +16,16 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.staticfiles import views
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 ]
 
-urlpatterns += patterns('',
-    url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
-        'document_root': settings.STATIC_ROOT,
-    }),
-)
+if settings.DEBUG:
+	urlpatterns += [
+	    url(r'^static/(?P<path>.*)$', views.serve),
+	]
+
+	urlpatterns += staticfiles_urlpatterns()
