@@ -1,1 +1,1 @@
-web: python manage.py runserver 8777
+web: python manage.py runserver $PORT
