@@ -1,0 +1,8 @@
+syntax: glob
+.settings*
+.project
+.pydevproject
+*.orig
+*Thumbs.db
+*.DS_Store
+env/
