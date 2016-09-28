@@ -60,7 +60,7 @@ class SundayService(CoreModel):
 class MemberModel(CoreModel):
     first_name = CharField(max_length=100)
     last_name = CharField(max_length=100)
-    contact_number = PositiveIntegerField(null=True, blank=True)
+    contact_number = CharField(max_length=100, null=True, blank=True)
     gender = CharField(max_length=1, choices=GENDER)
     birthdate = DateField(null=True, blank=True)
     facebook_id = CharField(

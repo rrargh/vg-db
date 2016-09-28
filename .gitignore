@@ -2,6 +2,7 @@ syntax: glob
 .settings*
 .project
 .pydevproject
+*.pyc
 *.orig
 *Thumbs.db
 *.DS_Store
