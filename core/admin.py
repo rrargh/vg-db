@@ -1,55 +1,83 @@
 from django.contrib import admin
 
 # Register your models here.
-from django.db.models import PositiveIntegerField
 from django.forms import TextInput
-from models import Disciple, SundayService, VictoryGroupLeader
+from models import Member, Ministry, SundayService, \
+    Venue, VictoryGroup
 
 
-class DiscipleInline(admin.TabularInline):
-    model = Disciple
+class MemberAdmin(admin.ModelAdmin):
+    model = Member
+    list_display = ('full_name', 'contact_number', 'service_attended',
+        'life_stage', 'ministry', 'coach', 'victory_group', 'is_vg_leader', 'is_active'
+    )
+    list_editable = ('contact_number', 'service_attended',
+        'life_stage', 'ministry', 'coach', 'victory_group', 'is_vg_leader', 'is_active'
+    )
+    list_filter = ('gender', 'life_stage', 'service_attended', 'ministry',
+        'one2one', 'victory_weekend', 'church_community', 'purple_book',
+        'making_disciples', 'empowering_leaders', 'leadership113', 'doing_one2one'
+    )
+    search_fields = ('first_name', 'last_name', 'facebook_id', 'email')
+    fieldsets = (
+            ("Personal Info", {
+                'fields': (
+                    'first_name', 'last_name', 'nickname',
+                    'birthdate', 'gender', 'life_stage',
+                     'contact_number', 'facebook_id', 'email'
+                )
+            }),
+            ('Victory Membership', {
+                'fields': (
+                    'service_attended', 'ministry', 'coach', 'victory_group',
+                    'doing_one2one', 'is_vg_leader', 'is_active'
+                )
+            }),
+            ('Discipleship Journey', {
+                'fields': (
+                    'one2one', 'victory_weekend', 'church_community',
+                    'purple_book', 'making_disciples',
+                    'empowering_leaders', 'leadership113'
+                )
+            }),
+    )
+
+
+class MemberInline(admin.TabularInline):
+    model = Member
     extra = 0
+    can_delete = False
+    verbose_name_plural = "Members (excluding VG leaders)"
 
 
-class VictoryGroupLeaderAdmin(admin.ModelAdmin):
-    model = VictoryGroupLeader
-    list_display = ('full_name', 'contact_number', 'service_attended',
-        'life_stage', 'vg_venue', 'vg_day', 'vg_time'
+class VictoryGroupAdmin(admin.ModelAdmin):
+    model = VictoryGroup
+    list_display = ('leader', 'demographic', 'day',
+        'time', 'venue', 'member_count'
     )
-    list_editable = ('contact_number', 'service_attended',
-        'life_stage', 'vg_venue', 'vg_day', 'vg_time'
+    list_editable = ('demographic', 'day', 'time', 'venue')
+    list_filter = ('demographic', 'group_type', 'group_age',
+        'year_started', 'day', 'time', 'venue'
     )
-    list_filter = ('gender', 'life_stage', 'service_attended',
-        'vg_venue', 'vg_day', 'vg_time'
-    )
-    search_fields = ('first_name', 'last_name', 'facebook_id', 'email')
-    formfield_overrides = {
-        PositiveIntegerField: {'widget': TextInput(attrs={'size':'20'})},
-    }
-    inlines = (DiscipleInline,)
+    readonly_fields = ('member_count',)
+    search_fields = ('leader', 'co_leader', 'vg_intern')
+    inlines = (MemberInline,)
+
+# FIXME: pastoral ministry?  staff?
+class MinistryAdmin(admin.ModelAdmin):
+    model = Ministry
 
 
-class DiscipleAdmin(admin.ModelAdmin):
-    model = Disciple
-    list_display = ('full_name', 'contact_number', 'service_attended',
-        'life_stage', 'victory_group_leader', 'vg_venue', 'vg_day', 'vg_time'
-    )
-    list_editable = ('contact_number', 'service_attended',
-        'life_stage', 'victory_group_leader'
-    )
-    list_filter = ('gender', 'life_stage', 'service_attended',
-        'victory_group_leader'
-    )
-    search_fields = ('first_name', 'last_name', 'facebook_id', 'email')
-    formfield_overrides = {
-        PositiveIntegerField: {'widget': TextInput(attrs={'size':'20'})},
-    }
-
-    
 class SundayServiceAdmin(admin.ModelAdmin):
     model = SundayService
 
 
-admin.site.register(VictoryGroupLeader, VictoryGroupLeaderAdmin)
-admin.site.register(Disciple, DiscipleAdmin)
+class VenueAdmin(admin.ModelAdmin):
+    model = Venue
+
+
+admin.site.register(Member, MemberAdmin)
+admin.site.register(Ministry, MinistryAdmin)
 admin.site.register(SundayService, SundayServiceAdmin)
+admin.site.register(Venue, VenueAdmin)
+admin.site.register(VictoryGroup, VictoryGroupAdmin)

@@ -1,13 +1,28 @@
 from __future__ import unicode_literals
+from datetime import date
+from django.db.models import Max, Min, Model, ForeignKey, \
+    BooleanField, CharField, DateField, DateTimeField, \
+    EmailField, NullBooleanField, PositiveIntegerField
 
-from django.db.models import Model, ForeignKey, \
-    CharField, DateField, DateTimeField, \
-    EmailField, PositiveIntegerField
 
+DEMOGRAPHICS = (
+    ("Kids", "Kids"),
+    ("Campus", "Campus"),
+    ("Singles", "Singles"),
+    ("Family", "Family"),
+    ("Single Parents", "Single Parents"),
+    ("Seniors", "Seniors")
+)
 
-GENDER = (
+GENDERS = (
     ("M", "Male"),
     ("F", "Female")
+)
+
+GROUP_TYPES = (
+    ("Males", "All Males"),
+    ("Females", "All Females"),
+    ("Mixed", "Mixed")
 )
 
 LIFE_STAGES = (
@@ -19,6 +34,21 @@ LIFE_STAGES = (
     ("Solo Parent", "Solo Parent"),
     ("Senior", "Senior"),
     ("Other", "Other")
+)
+
+MONTHS = (
+    ("Jan", "Jan"),
+    ("Feb", "Mon"),
+    ("Mar", "Mar"),
+    ("Apr", "Apr"),
+    ("May", "May"),
+    ("Jun", "Jun"),
+    ("Jul", "Jul"),
+    ("Aug", "Aug"),
+    ("Sep", "Sep"),
+    ("Oct", "Oct"),
+    ("Nov", "Nov"),
+    ("Dec", "Dec")
 )
 
 VG_DAYS = (
@@ -47,6 +77,17 @@ class CoreModel(Model):
         abstract = True
 
 
+class Ministry(CoreModel):
+    name = CharField(max_length=100)
+
+    class Meta:
+        verbose_name_plural = "Ministries"
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
 class SundayService(CoreModel):
     schedule = CharField(max_length=20)
 
@@ -57,22 +98,46 @@ class SundayService(CoreModel):
         return self.schedule
 
 
-class MemberModel(CoreModel):
+class Venue(CoreModel):
+    name = CharField(max_length=100)
+
+    class Meta:
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+#FIXME: what fields should be unique?
+class Member(CoreModel):
     first_name = CharField(max_length=100)
     last_name = CharField(max_length=100)
+    nickname = CharField(max_length=100, null=True, blank=True)
     contact_number = CharField(max_length=100, null=True, blank=True)
-    gender = CharField(max_length=1, choices=GENDER)
     birthdate = DateField(null=True, blank=True)
+    age = PositiveIntegerField(null=True, blank=True)
+    gender = CharField(max_length=1, choices=GENDERS)
     facebook_id = CharField(
         "Facebook ID", max_length=200, null=True, blank=True
     )
     email = EmailField(null=True, blank=True)
     life_stage = CharField(max_length=20, choices=LIFE_STAGES)
     service_attended = ForeignKey(SundayService, null=True, blank=True)
+    ministry = ForeignKey(Ministry, null=True, blank=True)
+    coach = ForeignKey('self', null=True, blank=True)
+    victory_group = ForeignKey("VictoryGroup", verbose_name="Under whose victory group?", null=True, blank=True)
+    one2one = NullBooleanField("Finished One2One?")
+    victory_weekend = NullBooleanField("Finished Victory Weekend?")
+    church_community = NullBooleanField("Finished Church Community?")
+    purple_book = NullBooleanField("Finished Purple Book?")
+    making_disciples = NullBooleanField("Finished Making Disciples?")
+    empowering_leaders = NullBooleanField("Finished Empowering Leaders?")
+    leadership113 = NullBooleanField("Finished Leadership 113?")
+    doing_one2one = NullBooleanField("Doing One2One?") #FIXME: account for season
+    is_vg_leader = NullBooleanField("Leader of a victory group?")
+    is_active = BooleanField(default=True)
 
     class Meta:
-        abstract = True
-        ordering = ('last_name',)
+        ordering = ('last_name', 'first_name')
 
     def __str__(self):
         return self.full_name
@@ -81,25 +146,80 @@ class MemberModel(CoreModel):
     def full_name(self):
         return "%s %s" % (self.first_name, self.last_name)
 
+    def get_age(self):
+        if self.birthdate is not None:
+            today = date.today()
+            return today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        return None
 
-class VictoryGroupLeader(MemberModel):
-    vg_venue = CharField("Victory group venue", max_length=200)
-    vg_day = CharField("Victory group day", max_length=3, choices=VG_DAYS)
-    vg_time = CharField("Victory group time", max_length=10, choices=VG_TIMES)
+    def save(self, *args, **kwargs):
+        if self.get_age() is not None:
+            self.age = self.get_age()
+        super(Member, self).save(*args, **kwargs)
 
+# FIXME: unique fields: leader, day, time, venue?
+class VictoryGroup(CoreModel):
+    leader = ForeignKey(Member, related_name="leader")
+    co_leader = ForeignKey(Member, null=True, blank=True, related_name="co_leader")
+    vg_intern = ForeignKey(Member, verbose_name="Intern", null=True, blank=True, related_name="intern")
+    demographic = CharField(max_length=20, choices=DEMOGRAPHICS)
+    group_type = CharField(max_length=10, choices=GROUP_TYPES)
+    group_age = CharField(max_length=20, null=True, blank=True)
+    month_started = CharField(max_length=3, null=True, blank=True, choices=MONTHS)
+    year_started = PositiveIntegerField(null=True, blank=True)
+    day = CharField(max_length=3, choices=VG_DAYS)
+    time = CharField(max_length=10, choices=VG_TIMES)
+    venue = ForeignKey(Venue)
+    member_count = PositiveIntegerField(null=True)
+    is_active = BooleanField(default=True)
 
-class Disciple(MemberModel):
-    victory_group_leader = ForeignKey(VictoryGroupLeader, null=True, blank=True)
+    def __str__(self):
+        return "%s - %s %s at %s" % (
+            self.leader,
+            self.day,
+            self.time,
+            self.venue
+        )
 
-    @property
-    def vg_venue(self):
-        return self.victory_group_leader.vg_venue
+    # @property
+    def get_members(self):
+        members = self.member_set.exclude(id=self.leader.id)
+        if self.co_leader is not None:
+            members = members.exclude(id=self.co_leader.id)
+        if members.count() > 0:
+            return members
+        return None
 
-    @property
-    def vg_day(self):
-        return self.victory_group_leader.vg_day
+    # @property
+    def get_member_count(self):
+        if self.get_members() is not None:
+            return self.get_members().count()
+        return 0
 
-    @property
-    def vg_time(self):
-        return self.victory_group_leader.vg_time
+    def get_youngest_age(self):
+        if self.get_member_count() > 0:
+            members = self.get_members()
+            return members.aggregate(Min('age'))["age__min"]
+        return None
 
+    def get_oldest_age(self):
+        if self.get_member_count() > 0:
+            members = self.get_members()
+            return members.aggregate(Max('age'))["age__max"]
+        return None
+
+    def save(self, *args, **kwargs):
+        self.member_count = self.get_member_count()
+        youngest_age = None
+        oldest_age = None
+        if self.get_youngest_age() is not None:
+            youngest_age = self.get_youngest_age()
+        if self.get_oldest_age() is not None:
+            oldest_age = self.get_oldest_age()
+        if youngest_age is not None and oldest_age is not None:
+            self.group_age = "%s to %s" % (youngest_age, oldest_age)
+        elif youngest_age is None and oldest_age is not None:
+            self.group_age = "Up to %s" % oldest_age
+        elif youngest_age is not None and oldest_age is None:
+            self.group_age = "%s up" % youngest_age
+        super(VictoryGroup, self).save(*args, **kwargs)
