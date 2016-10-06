@@ -123,7 +123,9 @@ class Member(CoreModel):
     life_stage = CharField(max_length=20, choices=LIFE_STAGES)
     service_attended = ForeignKey(SundayService, null=True, blank=True)
     ministry = ForeignKey(Ministry, null=True, blank=True)
-    coach = ForeignKey('self', null=True, blank=True)
+    coach = ForeignKey('self', null=True, blank=True,
+        verbose_name="VG Leader or Leadership Group Leader"
+    )
     victory_group = ForeignKey("VictoryGroup", null=True, blank=True,
         verbose_name="Under whose victory group?"
     )
