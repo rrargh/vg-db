@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.forms import TextInput
 from django.http import HttpResponse
 from django.utils.encoding import smart_unicode
+from forms import MemberForm
 from models import Member, Ministry, SundayService, \
     Venue, VictoryGroup
 
@@ -119,6 +120,8 @@ batch_download_xls.short_description = "Export as XLS"
 
 class MemberAdmin(admin.ModelAdmin):
     model = Member
+    form = MemberForm
+
     list_display = ('full_name', 'contact_number', 'service_attended',
         'life_stage', 'ministry', 'coach', 'victory_group',
         'is_vg_leader', 'is_active'
