@@ -9,6 +9,9 @@ from models import Member, Ministry, SundayService, \
     Venue, VictoryGroup
 
 
+admin.site.disable_action('delete_selected')
+
+
 def batch_download_csv(self, request, queryset):
     export_fields = self.list_for_export
     display_fields = self.list_display[1:]
