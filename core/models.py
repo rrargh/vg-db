@@ -124,7 +124,9 @@ class Member(CoreModel):
     service_attended = ForeignKey(SundayService, null=True, blank=True)
     ministry = ForeignKey(Ministry, null=True, blank=True)
     coach = ForeignKey('self', null=True, blank=True)
-    victory_group = ForeignKey("VictoryGroup", verbose_name="Under whose victory group?", null=True, blank=True)
+    victory_group = ForeignKey("VictoryGroup", null=True, blank=True,
+        verbose_name="Under whose victory group?"
+    )
     one2one = NullBooleanField("Finished One2One?")
     victory_weekend = NullBooleanField("Finished Victory Weekend?")
     church_community = NullBooleanField("Finished Church Community?")
@@ -149,7 +151,9 @@ class Member(CoreModel):
     def get_age(self):
         if self.birthdate is not None:
             today = date.today()
-            return today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+            return today.year - birthdate.year - (
+                (today.month, today.day) < (birthdate.month, birthdate.day)
+            )
         return None
 
     def save(self, *args, **kwargs):
@@ -160,8 +164,12 @@ class Member(CoreModel):
 # FIXME: unique fields: leader, day, time, venue?
 class VictoryGroup(CoreModel):
     leader = ForeignKey(Member, related_name="leader")
-    co_leader = ForeignKey(Member, null=True, blank=True, related_name="co_leader")
-    vg_intern = ForeignKey(Member, verbose_name="Intern", null=True, blank=True, related_name="intern")
+    co_leader = ForeignKey(Member, null=True, blank=True,
+        related_name="co_leader"
+    )
+    vg_intern = ForeignKey(Member, verbose_name="Intern", null=True, blank=True,
+        related_name="intern"
+    )
     demographic = CharField(max_length=20, choices=DEMOGRAPHICS)
     group_type = CharField(max_length=10, choices=GROUP_TYPES)
     group_age = CharField(max_length=20, null=True, blank=True)
