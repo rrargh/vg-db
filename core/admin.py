@@ -123,11 +123,11 @@ class MemberAdmin(admin.ModelAdmin):
     form = MemberForm
 
     list_display = ('full_name', 'contact_number', 'service_attended',
-        'life_stage', 'ministry', 'coach', 'victory_group',
+        'life_stage', 'ministry', 'coach',
         'is_vg_leader', 'is_active'
     )
     list_editable = ('contact_number', 'service_attended',
-        'life_stage', 'ministry', 'coach', 'victory_group',
+        'life_stage', 'ministry', 'coach',
         'is_vg_leader', 'is_active'
     )
     list_filter = ('gender', 'life_stage', 'service_attended', 'ministry',

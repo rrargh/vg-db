@@ -38,7 +38,7 @@ LIFE_STAGES = (
 
 MONTHS = (
     ("Jan", "Jan"),
-    ("Feb", "Mon"),
+    ("Feb", "Feb"),
     ("Mar", "Mar"),
     ("Apr", "Apr"),
     ("May", "May"),
