@@ -142,6 +142,7 @@ class Member(CoreModel):
 
     class Meta:
         ordering = ('last_name', 'first_name')
+        unique_together = ('last_name', 'first_name', 'birthdate')
 
     def __str__(self):
         return self.full_name
