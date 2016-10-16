@@ -184,6 +184,9 @@ class VictoryGroup(CoreModel):
     member_count = PositiveIntegerField(null=True)
     is_active = BooleanField(default=True)
 
+    class Meta:
+        ordering = ('leader',)
+
     def __str__(self):
         return "%s - %s %s at %s" % (
             self.leader,
