@@ -131,7 +131,7 @@ class MemberAdmin(admin.ModelAdmin):
         'is_vg_leader', 'is_active'
     )
     list_filter = ('gender', 'life_stage', 'service_attended', 'ministry',
-        'is_vg_leader', 'doing_one2one'
+        'is_vg_leader', 'doing_one2one',
         'one2one', 'victory_weekend', 'church_community', 'purple_book',
         'making_disciples', 'empowering_leaders', 'leadership113'
     )
