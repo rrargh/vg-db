@@ -154,8 +154,8 @@ class Member(CoreModel):
     def get_age(self):
         if self.birthdate is not None:
             today = date.today()
-            return today.year - birthdate.year - (
-                (today.month, today.day) < (birthdate.month, birthdate.day)
+            return today.year - self.birthdate.year - (
+                (today.month, today.day) < (self.birthdate.month, self.birthdate.day)
             )
         return None
 
