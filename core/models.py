@@ -33,6 +33,7 @@ LIFE_STAGES = (
     ("Married", "Married"),
     ("Solo Parent", "Solo Parent"),
     ("Senior", "Senior"),
+    ("Widow", "Widow"),
     ("Other", "Other")
 )
 
@@ -142,10 +143,11 @@ class Member(CoreModel):
 
     class Meta:
         ordering = ('last_name', 'first_name')
-        unique_together = ('last_name', 'first_name', 'birthdate')
+        unique_together = ('last_name', 'first_name', 'gender', 'birthdate')
 
     def __str__(self):
-        return self.full_name
+        return "%s, %s" % (self.last_name, self.first_name)
+        # return self.full_name
 
     @property
     def full_name(self):
