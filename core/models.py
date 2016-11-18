@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from datetime import date
+from django.core.exceptions import ValidationError
 from django.db.models import Max, Min, Model, ForeignKey, \
     BooleanField, CharField, DateField, DateTimeField, \
     EmailField, NullBooleanField, PositiveIntegerField
@@ -143,7 +144,7 @@ class Member(CoreModel):
 
     class Meta:
         ordering = ('last_name', 'first_name')
-        unique_together = ('last_name', 'first_name', 'gender', 'birthdate')
+        unique_together = (('last_name', 'first_name', 'gender', 'birthdate'),)
 
     def __str__(self):
         return "%s, %s" % (self.last_name, self.first_name)
@@ -161,9 +162,19 @@ class Member(CoreModel):
             )
         return None
 
+    def clean(self):
+        if Member.objects.filter(
+                last_name=self.last_name,
+                first_name=self.first_name,
+                gender=self.gender,
+                birthdate=self.birthdate,
+                ).exclude(id=self.id).exists():
+            raise ValidationError("Member entry already exists for %s" % self.full_name)
+
     def save(self, *args, **kwargs):
         if self.get_age() is not None:
             self.age = self.get_age()
+
         super(Member, self).save(*args, **kwargs)
 
 # FIXME: unique fields: leader, day, time, venue?
@@ -191,7 +202,7 @@ class VictoryGroup(CoreModel):
 
     def __str__(self):
         return "%s - %s %s at %s" % (
-            self.leader,
+            self.leader.full_name,
             self.day,
             self.time,
             self.venue
@@ -223,6 +234,17 @@ class VictoryGroup(CoreModel):
             members = self.get_members()
             return members.aggregate(Max('age'))["age__max"]
         return None
+
+    def clean(self):
+        if VictoryGroup.objects.filter(
+                leader=self.leader,
+                demographic=self.demographic,
+                group_type=self.group_type,
+                day=self.day,
+                time=self.time,
+                venue=self.venue,
+                ).exclude(id=self.id).exists():
+            raise ValidationError("Victory group entry already exists for %s" % self)
 
     def save(self, *args, **kwargs):
         self.member_count = self.get_member_count()
