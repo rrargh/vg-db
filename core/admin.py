@@ -10,7 +10,7 @@ from models import Member, Ministry, SundayService, \
     Venue, VictoryGroup
 
 
-admin.site.disable_action('delete_selected')
+# admin.site.disable_action('delete_selected')
 
 
 def batch_download_csv(self, request, queryset):
