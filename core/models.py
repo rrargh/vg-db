@@ -144,7 +144,7 @@ class Member(CoreModel):
 
     class Meta:
         ordering = ('last_name', 'first_name')
-        unique_together = (('last_name', 'first_name', 'gender', 'birthdate'),)
+        # unique_together = (('last_name', 'first_name', 'gender', 'birthdate'),)
 
     def __str__(self):
         return "%s, %s" % (self.last_name, self.first_name)
