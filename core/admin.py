@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.utils.encoding import smart_unicode
 from forms import MemberForm
 from models import Member, Ministry, SundayService, \
-    Venue, VictoryGroup
+    Venue, VictoryGroup, VIDCounter
 
 
 # admin.site.disable_action('delete_selected')
@@ -122,7 +122,7 @@ class MemberAdmin(admin.ModelAdmin):
     model = Member
     form = MemberForm
 
-    list_display = ('full_name', 'contact_number', 'service_attended',
+    list_display = ('full_name', 'victory_id', 'contact_number', 'service_attended',
         'life_stage', 'ministry', 'coach',
         'is_vg_leader', 'is_active'
     )
@@ -212,8 +212,13 @@ class VenueAdmin(admin.ModelAdmin):
     model = Venue
 
 
+class VIDCounterAdmin(admin.ModelAdmin):
+    model = VIDCounter
+
+
 admin.site.register(Member, MemberAdmin)
 admin.site.register(Ministry, MinistryAdmin)
 admin.site.register(SundayService, SundayServiceAdmin)
 admin.site.register(Venue, VenueAdmin)
 admin.site.register(VictoryGroup, VictoryGroupAdmin)
+admin.site.register(VIDCounter, VIDCounterAdmin)

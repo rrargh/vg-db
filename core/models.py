@@ -109,8 +109,25 @@ class Venue(CoreModel):
     def __str__(self):
         return self.name
 
+
+class VIDCounter(CoreModel):
+    vid_year = PositiveIntegerField(null=True, blank=True)
+    vid_month = PositiveIntegerField(null=True, blank=True)
+    vid_count = PositiveIntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return "%d-%d-%s" % (
+            self.vid_year,
+            self.vid_month,
+            str(self.vid_count).zfill(4)
+        )
+
+
 #FIXME: what fields should be unique?
 class Member(CoreModel):
+    victory_id = CharField("Victory ID", max_length=20, null=True, blank=True,
+        unique=True, editable=False
+    )
     first_name = CharField(max_length=100)
     last_name = CharField(max_length=100)
     nickname = CharField(max_length=100, null=True, blank=True)
@@ -174,6 +191,23 @@ class Member(CoreModel):
     def save(self, *args, **kwargs):
         if self.get_age() is not None:
             self.age = self.get_age()
+        if self.victory_id is None:
+            vid_year = self.created.year
+            vid_month = self.created.month
+            vid_entry, created = VIDCounter.objects.get_or_create(
+                vid_year=vid_year,
+                vid_month=vid_month
+                )
+            if vid_entry.vid_count is None:
+                vid_entry.vid_count = 1
+            else:
+                vid_entry.vid_count += 1
+            vid_entry.save()
+            self.victory_id = "%d-%d-%s" % (
+                vid_entry.vid_year,
+                vid_entry.vid_month,
+                str(vid_entry.vid_count).zfill(4)
+            )
 
         super(Member, self).save(*args, **kwargs)
 
