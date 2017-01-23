@@ -146,6 +146,8 @@ class MemberAdmin(admin.ModelAdmin):
         'empowering_leaders', 'leadership113'
     )
     search_fields = ('first_name', 'last_name', 'facebook_id', 'email')
+    exclude = ('victory_id',)
+    readonly_fields = ('victory_id',)
     fieldsets = (
             ("Personal Info", {
                 'fields': (
@@ -156,7 +158,7 @@ class MemberAdmin(admin.ModelAdmin):
             }),
             ('Victory Membership', {
                 'fields': (
-                    'service_attended', 'ministry', 'coach', 'victory_group',
+                    'victory_id', 'service_attended', 'ministry', 'coach', 'victory_group',
                     'doing_one2one', 'is_vg_leader', 'is_active'
                 )
             }),
