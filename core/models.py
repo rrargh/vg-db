@@ -125,8 +125,11 @@ class VIDCounter(CoreModel):
 
 #FIXME: what fields should be unique?
 class Member(CoreModel):
-    victory_id = CharField("Victory ID", max_length=20, null=True, blank=True,
-        unique=True, editable=False
+    victory_id = CharField(
+        "Victory ID", max_length=20,
+        null=True, blank=True,
+        # editable=False,
+        unique=True
     )
     first_name = CharField(max_length=100)
     last_name = CharField(max_length=100)
@@ -186,7 +189,23 @@ class Member(CoreModel):
                 gender=self.gender,
                 birthdate=self.birthdate,
                 ).exclude(id=self.id).exists():
-            raise ValidationError("Member entry already exists for %s" % self.full_name)
+            raise ValidationError(
+                "Member entry already exists for %s" % self.full_name
+            )
+        try:
+            vid_year, vid_month, vid_num = self.victory_id.split("-")
+            if not (
+                    vid_year.isdigit() and len(vid_year) == 4 \
+                    and vid_month.isdigit() and len(vid_month) == 2 \
+                    and vid_num.isdigit() and 0 < int(vid_num) < 10000
+            ):
+                raise ValidationError(
+                    "Please enter a unique valid ID number in YYYY-MM-nnnn format"
+                )
+        except:
+            raise ValidationError(
+                "Please enter a unique valid ID number in YYYY-MM-nnnn format"
+            )
 
     def save(self, *args, **kwargs):
         if self.get_age() is not None:
