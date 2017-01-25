@@ -138,7 +138,7 @@ class MemberAdmin(admin.ModelAdmin):
     list_for_export = (
         'first_name', 'last_name', 'nickname',
         'birthdate', 'gender', 'life_stage',
-        'contact_number', 'facebook_id', 'email',
+        'contact_number', 'facebook_id', 'email', 'victory_id',
         'service_attended', 'ministry', 'coach', 'victory_group',
         'doing_one2one', 'is_vg_leader', 'is_active',
         'one2one', 'victory_weekend', 'church_community',

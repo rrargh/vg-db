@@ -193,7 +193,9 @@ class Member(CoreModel):
                 "Member entry already exists for %s" % self.full_name
             )
         if self.victory_id is not None and self.victory_id != "":
-            if Member.objects.filter(victory_id=self.victory_id).exists():
+            if Member.objects.filter(
+                victory_id=self.victory_id
+                ).exclude(id=self.id).exists():
                 raise ValidationError(
                     "Member with ID %s already exists" % self.victory_id
                 )
