@@ -126,7 +126,7 @@ class MemberAdmin(admin.ModelAdmin):
         'life_stage', 'ministry', 'coach',
         'is_vg_leader', 'is_active'
     )
-    list_editable = ('contact_number', 'service_attended',
+    list_editable = ('victory_id', 'contact_number', 'service_attended',
         'life_stage', 'ministry', 'coach',
         'is_vg_leader', 'is_active'
     )

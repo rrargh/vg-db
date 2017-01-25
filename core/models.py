@@ -127,9 +127,9 @@ class VIDCounter(CoreModel):
 class Member(CoreModel):
     victory_id = CharField(
         "Victory ID", max_length=20,
-        null=True, blank=True,
         # editable=False,
-        unique=True
+        # unique=True,
+        null=True, blank=True
     )
     first_name = CharField(max_length=100)
     last_name = CharField(max_length=100)
@@ -192,24 +192,30 @@ class Member(CoreModel):
             raise ValidationError(
                 "Member entry already exists for %s" % self.full_name
             )
-        try:
-            vid_year, vid_month, vid_num = self.victory_id.split("-")
-            if not (
-                    vid_year.isdigit() and len(vid_year) == 4 \
-                    and vid_month.isdigit() and len(vid_month) == 2 \
-                    and vid_num.isdigit() and 0 < int(vid_num) < 10000
-            ):
+        if self.victory_id is not None and self.victory_id != "":
+            if Member.objects.filter(victory_id=self.victory_id).exists():
+                raise ValidationError(
+                    "Member with ID %s already exists" % self.victory_id
+                )
+            try:
+                vid_year, vid_month, vid_num = self.victory_id.split("-")
+                if not (
+                        vid_year.isdigit() and len(vid_year) == 4 \
+                        and vid_month.isdigit() and len(vid_month) == 2 \
+                        and vid_num.isdigit() and 0 < int(vid_num) < 10000
+                ):
+                    raise ValidationError(
+                        "Please enter a unique valid ID number in YYYY-MM-nnnn format"
+                    )
+            except:
                 raise ValidationError(
                     "Please enter a unique valid ID number in YYYY-MM-nnnn format"
                 )
-        except:
-            raise ValidationError(
-                "Please enter a unique valid ID number in YYYY-MM-nnnn format"
-            )
 
     def save(self, *args, **kwargs):
         if self.get_age() is not None:
             self.age = self.get_age()
+        '''
         if self.victory_id is None:
             vid_year = self.created.year
             vid_month = self.created.month
@@ -227,6 +233,7 @@ class Member(CoreModel):
                 vid_entry.vid_month,
                 str(vid_entry.vid_count).zfill(4)
             )
+        '''
 
         super(Member, self).save(*args, **kwargs)
 
