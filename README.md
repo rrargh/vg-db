@@ -42,13 +42,13 @@ cd vg-db
 pip install -r requirements.txt
 ```
 
-After updating *settings.py*, initialize database:
+After updating *settings.py*, initialize database from the root project folder:
 ```python
 python manage.py migrate
 ```
 
 ## Running the app
-Run the app by going to the ludare_project/ludare_project folder and typing:
+Run the app by going to the root project folder and typing:
 ```python
 python manage.py runserver
 ```
